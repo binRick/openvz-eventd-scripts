@@ -13,7 +13,6 @@ ts=$(date +%s)
 cmdFile=/root/.zfsVMStart_${ts}
 
 
-
 echo $VEID $VE_PRIVATE $VE_ROOT >> /tmp/vze
 if [ "$VE_PRIVATE" != "$zfsP" ]; then
 
@@ -21,7 +20,7 @@ if [ "$VE_PRIVATE" != "$zfsP" ]; then
 
 	echo "fixing private" >> /tmp/vze
 	zfs list $zfsFS 2>/dev/null || zfs create $zfsFS
-#		mkdir $zfsR -p 2>/dev/null && mkdir $zfsP/private 2>/dev/null && \
+	mkdir $zfsR -p 2>/dev/null && mkdir $zfsP/private 2>/dev/null
 echo "#" && echo -ne $COLOR_GREEN && zfs list tank/$VEID && echo -ne $COLOG_RED &&  zfs get -H -o value -p available tank && \
     echo sleep 60 && \
      echo -ne $COLOR_RESET  && \
