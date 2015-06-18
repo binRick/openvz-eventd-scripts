@@ -1,0 +1,36 @@
+#!/bin/sh
+Rsync='/usr/local/rsync/bin/rsync --numeric-ids --info=progress2 -ar'
+VEINFO=/proc/vz/veinfo
+test -n "$VEID" || exit 1
+test -f /usr/libexec/vzctl/scripts/vps-functions || exit 1
+. /usr/libexec/vzctl/scripts/vps-functions
+. /etc/vz/conf/${VEID}.conf
+zfsFS="tank/$VEID"
+zfsP="/tank/$VEID/private/$VEID"
+zfsR="/tank/$VEID/root"
+me=$(hostname -s)
+ts=$(date +%s)
+cmdFile=/root/.zfsVMStart_${ts}
+
+
+
+echo $VEID $VE_PRIVATE $VE_ROOT >> /tmp/vze
+if [ "$VE_PRIVATE" != "$zfsP" ]; then
+
+
+
+	echo "fixing private" >> /tmp/vze
+	zfs list $zfsFS 2>/dev/null || zfs create $zfsFS
+#		mkdir $zfsR -p 2>/dev/null && mkdir $zfsP/private 2>/dev/null && \
+echo "#" && echo -ne $COLOR_GREEN && zfs list tank/$VEID && echo -ne $COLOG_RED &&  zfs get -H -o value -p available tank && \
+    echo sleep 60 && \
+     echo -ne $COLOR_RESET  && \
+ls $VE_PRIVATE/etc/passwd && zfs list $zfsFS && \
+		$Rsync $VE_PRIVATE /$zfsFS/private/ && vzctl stop $VEID && $Rsync $VE_PRIVATE /$zfsFS/private/ && \
+		vzctl set $VEID --diskquota no --private $zfsP --root $zfsR --save && vzctl start $VEID && sleep 5 && \
+		vzctl exec $VEID ping 8.8.8.8 -c 1 | grep ' 0% loss'
+
+	echo -ne $COLOR_GREEN && echo  $cmdFile  >> /tmp/vze && echo -ne $COLOR_RESET
+
+
+fi
